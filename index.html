@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>生日快乐！Labubu 抽抽乐</title>
+    <title>付林生日抽抽乐</title>
     <!-- 引入 Tailwind CSS 进行快速样式设计 -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- 引入彩带特效库 -->
@@ -61,8 +61,8 @@
                  class="w-full h-48 object-cover"
                  id="hero-image">
         </div>
-        <h1 class="text-4xl text-pink-600 font-bold drop-shadow-md">✨ 生日快乐抽抽乐 ✨</h1>
-        <p class="text-gray-600 mt-2">选一个 Labubu 盲盒，扫描支付开启惊喜！</p>
+        <h1 class="text-4xl text-pink-600 font-bold drop-shadow-md">✨ 付林生日抽抽乐 ✨</h1>
+        <p class="text-gray-600 mt-2">选一个盲盒，扫描支付开启惊喜～</p>
     </header>
 
     <!-- 2. 六个格子的抽奖区域 -->
@@ -74,7 +74,7 @@
     <div id="pay-modal" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 hidden">
         <div class="bg-white rounded-2xl p-6 max-w-sm w-[90%] text-center shadow-2xl modal-enter border-4 border-green-400">
             <h3 class="text-2xl text-gray-800 mb-4">🎁 开启这个盲盒</h3>
-            <p class="text-gray-500 mb-4">请扫描下方二维码支付 <span class="text-red-500 font-bold">¥??.??</span></p>
+            <p class="text-gray-500 mb-4">请扫描下方二维码支付 <span class="text-red-500 font-bold">¥49</span></p>
             
             <!-- 支付二维码图片占位符 -->
             <div class="bg-gray-100 p-4 rounded-lg mb-4 inline-block">
@@ -84,11 +84,24 @@
                      class="w-48 h-48 object-contain">
             </div>
             
-            <p class="text-xs text-gray-400 mb-4">*支付金额随意，开心就好*</p>
+            <p class="text-xs text-gray-400 mb-4">*支付金额不随意，开心就好ლ(°◕‵ƹ′◕ლ)*</p>
             
+            <!-- 按钮区域 -->
             <div class="flex justify-center gap-4">
-                <button onclick="closeModal('pay-modal')" class="px-4 py-2 rounded-full bg-gray-200 text-gray-600 hover:bg-gray-300 transition">算了</button>
-                <button onclick="confirmPayment()" class="px-6 py-2 rounded-full bg-green-500 text-white font-bold hover:bg-green-600 shadow-lg transition transform active:scale-95">我已支付</button>
+                <!-- 1. “如算”按钮：点击后触发 refuseAction()，不关闭弹窗 -->
+                <button onclick="refuseAction()" class="px-4 py-2 rounded-full bg-gray-200 text-gray-600 hover:bg-gray-300 transition">
+                    如算
+                </button>
+                
+                <!-- 2. “我已支付”按钮：点击触发 handlePayment()，带模拟交互 -->
+                <button id="btn-pay" onclick="handlePayment()" class="px-6 py-2 rounded-full bg-green-500 text-white font-bold hover:bg-green-600 shadow-lg transition flex items-center">
+                    <span>我已支付</span>
+                    <!-- 这里藏了一个加载圈，默认隐藏 -->
+                    <svg id="loading-icon" class="animate-spin ml-2 h-5 w-5 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                </button>
             </div>
         </div>
     </div>
@@ -107,7 +120,7 @@
                     <!-- SVG图标将插入这里 -->
                 </div>
                 <div class="text-2xl text-gray-800 font-bold" id="prize-name">奖品名称</div>
-                <div class="text-sm text-gray-500 mt-2">（凭借截图找我兑换哦~）</div>
+                <div class="text-sm text-gray-500 mt-2">（凭借截图找我兑换哦宝见~）</div>
             </div>
 
             <button onclick="closeModal('prize-modal')" class="w-full py-3 rounded-xl bg-pink-500 text-white font-bold text-lg hover:bg-pink-600 shadow-lg transition">收下礼物 ❤️</button>
@@ -130,7 +143,7 @@
                 svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></svg>`
             },
             { 
-                name: "高级香水 🧴", 
+                name: "我的体香 🧴", 
                 svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 12h4"/><path d="M12 12v6"/><path d="M7 21h10a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2z"/><path d="M9 7V5a3 3 0 0 1 6 0v2"/></svg>`
             },
             { 
@@ -233,6 +246,45 @@
                 confetti(Object.assign({}, defaults, { particleCount, origin: { x: random(0.1, 0.3), y: Math.random() - 0.2 } }));
                 confetti(Object.assign({}, defaults, { particleCount, origin: { x: random(0.7, 0.9), y: Math.random() - 0.2 } }));
             }, 250);
+        }
+
+        // 1. “如算”按钮的逻辑：也就是不准走！
+        function refuseAction() {
+            // 震动一下手机（部分手机支持）
+            if (navigator.vibrate) {
+                navigator.vibrate(200);
+            }
+            // 弹出提示，不关闭窗口
+            alert("不可以算了！\n来都来了，哪有不抽的道理？😤\n（必须支付才能走！）");
+        }
+
+        // 2. “我已支付”的逻辑：模拟真实的微信交互感
+        function handlePayment() {
+            const btn = document.getElementById('btn-pay');
+            const icon = document.getElementById('loading-icon');
+            const text = btn.querySelector('span');
+
+            // 1. 改变按钮状态：显示转圈圈，文字变成“正在验证...”
+            btn.disabled = true; // 防止重复点击
+            icon.classList.remove('hidden'); // 显示转圈
+            text.textContent = "正在连接微信验证..."; // 假装在联网
+            btn.classList.replace('bg-green-500', 'bg-green-600');
+
+            // 2. 模拟网络延迟（3秒后才成功）
+            setTimeout(() => {
+                // 验证成功！
+                closeModal('pay-modal'); // 关闭弹窗
+                showPrize(); // 开奖
+
+                // 3. 重置按钮（为了下次还能用）
+                setTimeout(() => {
+                    btn.disabled = false;
+                    icon.classList.add('hidden');
+                    text.textContent = "我已支付";
+                    btn.classList.replace('bg-green-600', 'bg-green-500');
+                }, 1000);
+                
+            }, 3000); // 这里的 3000 代表 3秒，你可以自己改长短
         }
 
         // 页面加载时初始化
